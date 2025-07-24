@@ -20,6 +20,7 @@ Thumbs.db
 # Environment and secrets
 .env
 
+token.pkl
 
 # Logs
 *.log
