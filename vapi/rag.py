@@ -20,7 +20,8 @@ class RAGEngine:
         self.faiss_path = faiss_path
         self.apartment_faiss_path = apartment_path
         self.apartment_json_path = apartment_json_path
-        self.model_name = "BAAI/bge-base-en"
+        self.model_name = "sentence-transformers/all-MiniLM-L6-v2"
+        #"BAAI/bge-base-en"
         self.embedding_model = HuggingFaceEmbeddings(model_name=self.model_name)
 
         # Load or build rules index
