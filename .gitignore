@@ -19,7 +19,7 @@ vector_store/*.pkl
 
 # Environment and secrets
 .env
-token.pkl
+
 
 # Logs
 *.log
