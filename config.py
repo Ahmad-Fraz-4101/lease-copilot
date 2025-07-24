@@ -34,10 +34,10 @@ DATA_FILE = os.getenv("DATA_FILE", "data.json")
 # ========================================
 DAILY_LIMIT = int(os.getenv("DAILY_LIMIT", 100))
 DEFAULT_TIMEZONE = "Asia/Karachi"
-# WORKING_HOURS = {
-#     "start": 8,  # 8 AM
-#     "end": 21    # 9 PM
-# }
+WORKING_HOURS = {
+     "start": 8,  # 8 AM
+     "end": 21    # 9 PM
+ }
 SLOT_DURATION = 30  # minutes
 
 # ========================================
