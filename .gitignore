@@ -14,8 +14,8 @@ ENV/
 Thumbs.db
 
 # FAISS large files
-vector_store/*.faiss
-vector_store/*.pkl
+#vector_store/*.faiss
+#vector_store/*.pkl
 
 # Environment and secrets
 .env

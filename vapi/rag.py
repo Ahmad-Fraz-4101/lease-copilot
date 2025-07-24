@@ -53,7 +53,8 @@ class RAGEngine:
             print("Apartment FAISS index saved.")
 
     def _faiss_index_exists(self, path: str) -> bool:
-        return os.path.exists(f"{path}.faiss") and os.path.exists(f"{path}.pkl")
+        return os.path.exists(os.path.join(path, "index.faiss")) and \
+           os.path.exists(os.path.join(path, "index.pkl"))
 
     def _build_vector_store(self):
         if not os.path.exists(self.docs_path):
