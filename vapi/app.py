@@ -284,7 +284,7 @@ async def twilio_incoming(
     Body: str = Form(...)
 ):
     #print("Incoming WhatsApp message from:", From)
-    #print("Message content:", Body)
+    print("Message content:", Body)
     if not message_limiter.check_message_limit(From):
             twiml = MessagingResponse()
             twiml.message(" You've reached the daily message limit. Please try again tomorrow.")
