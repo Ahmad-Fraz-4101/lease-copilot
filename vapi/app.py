@@ -284,7 +284,7 @@ async def twilio_incoming(
             response = await client.post(
                 "https://api.vapi.ai/chat",
                 headers={
-                    "Authorization": "Bearer {VAPI_API_KEY}",
+                    "Authorization": f"Bearer {VAPI_API_KEY}",
                     "Content-Type": "application/json"
                 },
                 json=payload
