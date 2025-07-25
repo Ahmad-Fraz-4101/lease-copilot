@@ -14,7 +14,7 @@ import pickle
 import os
 from vapi.bounded_usage import MessageLimiter
 from twilio.twiml.messaging_response import MessagingResponse
-from config import TOKEN_FILE, CREDENTIALS_FILE, REDIRECT_URI
+from config import TOKEN_FILE, CREDENTIALS_FILE, REDIRECT_URI, LIMIT_FILE, CHAT_SESSIONS_FILE,timeout,DAILY_LIMIT,TWILIO_PHONE_NUMBER
 
 
 from fastapi import FastAPI, Form, Request
@@ -29,7 +29,7 @@ VAPI_API_KEY = os.getenv("VAPI_API_KEY")
 VAPI_ASSISTANT_ID = os.getenv("VAPI_ASSISTANT_ID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-TWILIO_PHONE_NUMBER = "whatsapp:+14155238886"
+
 
 
 
@@ -256,11 +256,9 @@ def _handle_oauth2callback( request: FastAPIRequest) -> Response:
         except Exception as e:
             return Response(content=f"Authorization failed: {str(e)}", media_type="text/html", status_code=400)
 
-LIMIT_FILE="messageLimits.json"
-DAILY_LIMIT= 50
+
 message_limiter = MessageLimiter(LIMIT_FILE, DAILY_LIMIT)
-CHAT_SESSIONS_FILE = "chat_session.json"
-timeout = httpx.Timeout(15.0)
+
 # Store chat IDs per WhatsApp user
 def load_chat_sessions():
     if os.path.exists(CHAT_SESSIONS_FILE):

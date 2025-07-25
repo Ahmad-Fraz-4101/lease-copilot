@@ -3,15 +3,16 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import date
+import httpx
 
 load_dotenv()
 
+TWILIO_PHONE_NUMBER = "whatsapp:+14155238886"
 # ========================================
 # API Keys and URLs
 # ========================================
-# GENAI_API_KEY = os.getenv("GENAI_API_KEY")
-# TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-REDIRECT_URI = "https://2aab9bffd32f.ngrok-free.app/oauth2callback"
+
+REDIRECT_URI = "https://lease-copilot.onrender.com/oauth2callback"
 
 # ========================================
 # File Paths
@@ -21,6 +22,10 @@ TOKEN_FILE = "token.pkl"
 LIMIT_FILE = "messageLimits.json"
 RULES_FILE = os.getenv("RULES_FILE", "Rules.txt")
 DATA_FILE = os.getenv("DATA_FILE", "data.json")
+CHAT_SESSIONS_FILE = "chat_session.json"
+timeout = httpx.Timeout(25.0)
+LIMIT_FILE="messageLimits.json"
+DAILY_LIMIT= 50
 
 # FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH", "faiss_index/index/index")
 # GOOGLE_CREDENTIALS = os.getenv("GOOGLE_CREDENTIALS", "voice/gcloudSTT.json")
@@ -32,7 +37,7 @@ DATA_FILE = os.getenv("DATA_FILE", "data.json")
 # ========================================
 # Application Settings
 # ========================================
-DAILY_LIMIT = int(os.getenv("DAILY_LIMIT", 100))
+# DAILY_LIMIT = int(os.getenv("DAILY_LIMIT", 100))
 DEFAULT_TIMEZONE = "Asia/Karachi"
 WORKING_HOURS = {
      "start": 8,  # 8 AM
