@@ -12,6 +12,8 @@ from fastapi.responses import RedirectResponse, Response
 from google_auth_oauthlib.flow import Flow
 import pickle
 import os
+from vapi.bounded_usage import MessageLimiter
+from twilio.twiml.messaging_response import MessagingResponse
 from config import TOKEN_FILE, CREDENTIALS_FILE, REDIRECT_URI
 
 
@@ -253,11 +255,29 @@ def _handle_oauth2callback( request: FastAPIRequest) -> Response:
             return Response(content="Authorization successful. You can now schedule visits.", media_type="text/html")
         except Exception as e:
             return Response(content=f"Authorization failed: {str(e)}", media_type="text/html", status_code=400)
-        
 
+LIMIT_FILE="messageLimits.json"
+DAILY_LIMIT= 50
+message_limiter = MessageLimiter(LIMIT_FILE, DAILY_LIMIT)
+CHAT_SESSIONS_FILE = "chat_session.json"
 timeout = httpx.Timeout(15.0)
 # Store chat IDs per WhatsApp user
-chat_sessions = {}
+def load_chat_sessions():
+    if os.path.exists(CHAT_SESSIONS_FILE):
+        with open(CHAT_SESSIONS_FILE, "r", encoding="utf-8") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return {}
+    return {}
+
+# Save chat sessions to file
+def save_chat_sessions(chat_sessions):
+    with open(CHAT_SESSIONS_FILE, "w", encoding="utf-8") as f:
+        json.dump(chat_sessions, f, indent=2)
+
+# Use persistent chat sessions
+chat_sessions = load_chat_sessions()
 
 @app.post("/twilio-incoming")
 async def twilio_incoming(
@@ -267,7 +287,10 @@ async def twilio_incoming(
 ):
     #print("Incoming WhatsApp message from:", From)
     #print("Message content:", Body)
-
+    if not message_limiter.check_message_limit(From):
+            twiml = MessagingResponse()
+            twiml.message(" You've reached the daily message limit. Please try again tomorrow.")
+            return Response(content=str(twiml), media_type="application/xml")
     # Build the payload
     payload = {
         "assistantId": VAPI_ASSISTANT_ID,
@@ -277,6 +300,7 @@ async def twilio_incoming(
     # If this number has an ongoing chat, include previousChatId
     if From in chat_sessions:
         payload["previousChatId"] = chat_sessions[From]
+
 
     # Send to Vapi
     try:
@@ -308,7 +332,7 @@ async def twilio_incoming(
         #print("Vapi returned empty or invalid output:", output)
         return PlainTextResponse("Vapi returned no output", status_code=500)
 
-    #first_message = output[0]
+   
     vapi_reply = None
     for item in response_json.get("output", []):
         if item.get("role") == "assistant" and "content" in item:
@@ -325,6 +349,7 @@ async def twilio_incoming(
     chat_id = response_json.get("id")
     if chat_id:
         chat_sessions[From] = chat_id
+        save_chat_sessions(chat_sessions)
 
     # Send reply via Twilio
     async with httpx.AsyncClient() as client:
