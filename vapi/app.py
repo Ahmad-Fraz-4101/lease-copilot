@@ -316,8 +316,8 @@ async def twilio_incoming(
     except Exception as e:
         return PlainTextResponse(f"Unexpected error: {str(e)}", status_code=500)
 
-    #print("Vapi status:", response.status_code)
-    #print("Vapi response:", response.text)
+    print("Vapi status:", response.status_code)
+    print("Vapi response:", response.text)
 
     if response.status_code not in [200, 201]:
         return PlainTextResponse("Error with Vapi", status_code=500)
@@ -327,7 +327,7 @@ async def twilio_incoming(
     output = response_json.get("output", [])
 
     if not output or not isinstance(output, list):
-        #print("Vapi returned empty or invalid output:", output)
+        print("Vapi returned empty or invalid output:", output)
         return PlainTextResponse("Vapi returned no output", status_code=500)
 
    

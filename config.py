@@ -12,7 +12,7 @@ TWILIO_PHONE_NUMBER = "whatsapp:+14155238886"
 # API Keys and URLs
 # ========================================
 
-REDIRECT_URI = "https://lease-copilot.onrender.com/oauth2callback"
+REDIRECT_URI = "https://2aab9bffd32f.ngrok-free.app/oauth2callback"
 
 # ========================================
 # File Paths
