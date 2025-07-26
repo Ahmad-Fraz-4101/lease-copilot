@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 from fastapi.responses import RedirectResponse, Response
 from google_auth_oauthlib.flow import Flow
 import pickle
-import os
+import os,base64
 from vapi.bounded_usage import MessageLimiter
 from twilio.twiml.messaging_response import MessagingResponse
 from config import TOKEN_FILE, CREDENTIALS_FILE, REDIRECT_URI, LIMIT_FILE, CHAT_SESSIONS_FILE,timeout,DAILY_LIMIT,TWILIO_PHONE_NUMBER
@@ -30,8 +30,6 @@ VAPI_API_KEY = os.getenv("VAPI_API_KEY")
 VAPI_ASSISTANT_ID = os.getenv("VAPI_ASSISTANT_ID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-
-
 
 
 
@@ -220,6 +218,15 @@ def download_token():
     if os.path.exists(TOKEN_PATH):
         return FileResponse(TOKEN_PATH, filename="token.pkl")
     return {"error": "token.pkl not found"}
+
+
+def restore_token():
+    token_b64 = os.getenv("TOKEN_PKL")
+    if token_b64:
+        with open(TOKEN_PATH, "wb") as f:
+            f.write(base64.b64decode(token_b64))
+        print("token.pkl restored from environment variable")
+restore_token()
 
 @app.get("/authorize")
 def authorize():
