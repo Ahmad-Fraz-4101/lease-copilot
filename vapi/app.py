@@ -8,6 +8,7 @@ from vapi.rag import RAGEngine
 from httpx import TimeoutException
 from datetime import datetime
 from fastapi import Request as FastAPIRequest
+from fastapi.responses import FileResponse
 from fastapi.responses import RedirectResponse, Response
 from google_auth_oauthlib.flow import Flow
 import pickle
@@ -212,6 +213,13 @@ def get_slots(request: VapiRequest):
                 raise HTTPException(status_code=500, detail=f"Failed to retrieve calendar slots: {str(e)}")
 
     raise HTTPException(status_code=400, detail="No valid 'getAvailableSlots' tool call found.")
+
+TOKEN_PATH = "token.pkl"
+@app.get("/download-token")
+def download_token():
+    if os.path.exists(TOKEN_PATH):
+        return FileResponse(TOKEN_PATH, filename="token.pkl")
+    return {"error": "token.pkl not found"}
 
 @app.get("/authorize")
 def authorize():
