@@ -112,6 +112,39 @@ def search_apartments(request: VapiRequest):
     raise HTTPException(status_code=400, detail="Invalid tool call")
 
 
+
+
+@app.post("/confirm_address/")
+def search_apartments(request: VapiRequest):
+    for tool_call in request.message.toolCalls:
+        if tool_call.function.name == "confirmAddress":
+            args = tool_call.function.arguments
+            if isinstance(args, str):
+                query = args.strip()
+            elif isinstance(args, dict):
+                query = args.get("query", "").strip()
+            else:
+                raise HTTPException(status_code=400, detail="Invalid arguments format")
+
+            if not query:
+                raise HTTPException(status_code=400, detail="Missing query text")
+            
+            if not query:
+                raise HTTPException(status_code=400, detail="Missing query text")
+            
+            listings = rag.search_apartments(query)
+            return {
+                "results": [
+                    {
+                        "toolCallId": tool_call.id,
+                        "result": listings
+                    }
+                ]
+            }
+
+    raise HTTPException(status_code=400, detail="Invalid tool call")
+
+
 @app.post("/get_date/")
 def get_date(request: VapiRequest):
     for tool_call in request.message.toolCalls:
