@@ -15,9 +15,8 @@ import pickle
 import os,base64
 from vapi.bounded_usage import MessageLimiter
 from twilio.twiml.messaging_response import MessagingResponse
-from config import TOKEN_FILE, CREDENTIALS_FILE, REDIRECT_URI, LIMIT_FILE, CHAT_SESSIONS_FILE,timeout,DAILY_LIMIT,TWILIO_PHONE_NUMBER
-
-
+from config import TOKEN_FILE, CREDENTIALS_FILE, REDIRECT_URI, LIMIT_FILE,timeout,DAILY_LIMIT,TWILIO_PHONE_NUMBER,TOKEN_PATH
+from session_manager import *
 from fastapi import FastAPI, Form, Request
 import httpx
 import os
@@ -36,7 +35,9 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 app = FastAPI()
 rag = RAGEngine()
 calendar = GoogleCalendar()
-
+# Use persistent chat sessions
+chat_sessions = load_chat_sessions()
+message_limiter = MessageLimiter(LIMIT_FILE, DAILY_LIMIT)
 
 class ToolCallFunction(BaseModel):
     name: str
@@ -212,7 +213,8 @@ def get_slots(request: VapiRequest):
 
     raise HTTPException(status_code=400, detail="No valid 'getAvailableSlots' tool call found.")
 
-TOKEN_PATH = "token.pkl"
+
+
 @app.get("/download-token")
 def download_token():
     if os.path.exists(TOKEN_PATH):
@@ -271,26 +273,6 @@ def _handle_oauth2callback( request: FastAPIRequest) -> Response:
         except Exception as e:
             return Response(content=f"Authorization failed: {str(e)}", media_type="text/html", status_code=400)
 
-
-message_limiter = MessageLimiter(LIMIT_FILE, DAILY_LIMIT)
-
-# Store chat IDs per WhatsApp user
-def load_chat_sessions():
-    if os.path.exists(CHAT_SESSIONS_FILE):
-        with open(CHAT_SESSIONS_FILE, "r", encoding="utf-8") as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                return {}
-    return {}
-
-# Save chat sessions to file
-def save_chat_sessions(chat_sessions):
-    with open(CHAT_SESSIONS_FILE, "w", encoding="utf-8") as f:
-        json.dump(chat_sessions, f, indent=2)
-
-# Use persistent chat sessions
-chat_sessions = load_chat_sessions()
 
 @app.post("/twilio-incoming")
 async def twilio_incoming(
