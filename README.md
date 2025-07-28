@@ -1,2 +1,2 @@
-# lease-copilot
-Leasing Copilot for Real Estate
+# leasing-copilot
+Implementation of chat and calling bot using VAPI
