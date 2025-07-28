@@ -8,6 +8,7 @@ import httpx
 load_dotenv()
 
 TWILIO_PHONE_NUMBER = "whatsapp:+14155238886"
+TOKEN_PATH = "token.pkl"
 # ========================================
 # API Keys and URLs
 # ========================================
